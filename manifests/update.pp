@@ -28,11 +28,11 @@
 #   }
 #
 define reprepro::update (
-  $suite,
   $repository,
   $url,
   $basedir = $::reprepro::params::basedir,
   $ensure = present,
+  $suite = '',
   $architectures = undef,
   $verify_release = 'blindtrust',
   $filter_action = '',
