@@ -12,28 +12,31 @@
 #   class { 'reprepro': }
 #
 class reprepro (
-  $basedir = $::reprepro::params::basedir,
-  $homedir = $::reprepro::params::homedir,
+  $basedir     = $::reprepro::params::basedir,
+  $homedir     = $::reprepro::params::homedir,
+  $manage_user = true,
 ) inherits reprepro::params {
 
   package { $::reprepro::params::package_name:
     ensure => $::reprepro::params::ensure,
   }
 
-  group { 'reprepro':
-    ensure => present,
-    name   => $::reprepro::params::group_name,
-  }
+  if $manage_user {
+    group { 'reprepro':
+      ensure => present,
+      name   => $::reprepro::params::group_name,
+    }
 
-  user { 'reprepro':
-    ensure     => present,
-    name       => $::reprepro::params::user_name,
-    home       => $homedir,
-    shell      => '/bin/bash',
-    comment    => 'Reprepro user',
-    gid        => 'reprepro',
-    managehome => true,
-    require    => Group['reprepro'],
+    user { 'reprepro':
+      ensure     => present,
+      name       => $::reprepro::params::user_name,
+      home       => $homedir,
+      shell      => '/bin/bash',
+      comment    => 'Reprepro user',
+      gid        => 'reprepro',
+      managehome => true,
+      require    => Group['reprepro'],
+    }
   }
 
   file { $basedir:
