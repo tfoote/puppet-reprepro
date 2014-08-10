@@ -30,13 +30,15 @@
 define reprepro::update (
   $repository,
   $url,
-  $basedir = $::reprepro::params::basedir,
-  $ensure = present,
-  $suite = '',
-  $architectures = undef,
+  $basedir        = $::reprepro::params::basedir,
+  $ensure         = present,
+  $suite          = undef,
+  $architectures  = undef,
+  $components     = undef,
+  $udebcomponents = undef,
   $verify_release = 'blindtrust',
-  $filter_action = '',
-  $filter_name = ''
+  $filter_action  = '',
+  $filter_name    = '',
 ) {
 
   include reprepro::params
