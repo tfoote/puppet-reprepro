@@ -134,6 +134,19 @@ define reprepro::repository (
     require => File["${basedir}/${name}/conf"],
   }
 
+  $ensure_incoming_cron = $incoming_allow ? {
+    /.+/    => 'present',
+    default => 'absent',
+  }
+
+  cron { "incoming ${name} cron":
+    ensure      => $ensure_incoming_cron,
+    command     => "reprepro -b ${basedir}/${name} processincoming ${incoming_name}",
+    user        => $::reprepro::params::user_name,
+    environment => 'SHELL=/bin/bash',
+    minute      => '*/5',
+  }
+
   concat { "${basedir}/${name}/conf/distributions":
     owner   => $owner,
     group   => $group,
