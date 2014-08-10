@@ -1,13 +1,21 @@
+<% if @origin -%>
 Origin: <%= @origin %>
+<% end -%>
+<% if @label -%>
 Label: <%= @label %>
+<% end -%>
+<% if @suite -%>
 Suite: <%= @suite %>
+<% end -%>
 Codename: <%= @codename %>
 Architectures: <%= @architectures %>
 Components: <%= @components %>
 <% if @udebcomponents != "" -%>
 UDebComponents: <%= @udebcomponents %>
 <% end -%>
+<% if @description -%>
 Description: <%= @description %>
+<% end -%>
 DebIndices: <%= @deb_indices %>
 DscIndices: <%= @dsc_indices %>
 <% if @sign_with != "" -%>
