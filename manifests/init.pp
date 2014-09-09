@@ -15,6 +15,8 @@ class reprepro (
   $basedir     = $::reprepro::params::basedir,
   $homedir     = $::reprepro::params::homedir,
   $manage_user = true,
+  $user_name   = $::reprepro::params::user_name,
+  $group_name  = $::reprepro::params::group_name,
 ) inherits reprepro::params {
 
   package { $::reprepro::params::package_name:
@@ -22,53 +24,51 @@ class reprepro (
   }
 
   if $manage_user {
-    group { 'reprepro':
+    group { $group_name:
       ensure => present,
-      name   => $::reprepro::params::group_name,
     }
 
-    user { 'reprepro':
+    user { $user_name:
       ensure     => present,
-      name       => $::reprepro::params::user_name,
       home       => $homedir,
       shell      => '/bin/bash',
       comment    => 'Reprepro user',
       gid        => 'reprepro',
       managehome => true,
-      require    => Group['reprepro'],
+      require    => Group[$group_name],
     }
 
     file { $basedir:
       ensure  => directory,
-      owner   => $::reprepro::params::user_name,
-      group   => $::reprepro::params::group_name,
+      owner   => $user_name,
+      group   => $group_name,
       mode    => '0755',
-      require => User['reprepro'],
+      require => User[$user_name],
     }
   }
 
   file { "${homedir}/.gnupg":
     ensure  => directory,
-    owner   => $::reprepro::params::user_name,
-    group   => $::reprepro::params::group_name,
+    owner   => $user_name,
+    group   => $group_name,
     mode    => '0700',
-    require => User['reprepro'],
+    require => User[$user_name],
   }
 
-  file { "${::reprepro::params::homedir}/bin":
+  file { "${homedir}/bin":
     ensure  => directory,
     mode    => '0755',
-    owner   => $::reprepro::params::user_name,
-    group   => $::reprepro::params::group_name,
-    require => User['reprepro'],
+    owner   => $user_name,
+    group   => $group_name,
+    require => User[$user_name],
   }
   ->
-  file { "${::reprepro::params::homedir}/bin/update-distribution.sh":
+  file { "${homedir}/bin/update-distribution.sh":
     ensure  => file,
     mode    => '0755',
     content => template('reprepro/update-distribution.sh.erb'),
-    owner   => $::reprepro::params::user_name,
-    group   => $::reprepro::params::group_name,
+    owner   => $user_name,
+    group   => $group_name,
   }
 
 }

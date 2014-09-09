@@ -82,10 +82,11 @@ define reprepro::distribution (
   exec {"export distribution ${name}":
     command     => "su -c 'reprepro -b ${basedir}/${repository} export ${codename}' reprepro",
     path        => ['/bin', '/usr/bin'],
+    onlyif      => '',
     refreshonly => true,
     logoutput   => on_failure,
     require     => [
-      User['reprepro'],
+      User[$reprepro::user_name],
       Reprepro::Repository[$repository]
     ],
   }
@@ -94,31 +95,34 @@ define reprepro::distribution (
   file { "${basedir}/${repository}/tmp/${codename}":
     ensure => directory,
     mode   => '0755',
-    owner  => $::reprepro::params::user_name,
-    group  => $::reprepro::params::group_name,
+    owner  => $reprepro::user_name,
+    group  => $reprepro::group_name,
   }
 
   if $install_cron {
 
     if $snapshots {
-      $command = "${::reprepro::params::homedir}/bin/update-distribution.sh -r ${repository} -c ${codename} -s"
+      $command = "${reprepro::homedir}/bin/update-distribution.sh -r ${repository} -c ${codename} -s"
     } else {
-      $command = "${::reprepro::params::homedir}/bin/update-distribution.sh -r ${repository} -c ${codename}"
+      $command = "${reprepro::homedir}/bin/update-distribution.sh -r ${repository} -c ${codename}"
     }
 
     cron { "${name} cron":
       command     => $command,
-      user        => $::reprepro::params::user_name,
+      user        => $reprepro::user_name,
       environment => 'SHELL=/bin/bash',
       minute      => '*/5',
-      require     => File["${::reprepro::params::homedir}/bin/update-distribution.sh"],
+      require     => [
+        User[$reprepro::user_name],
+        File["${reprepro::homedir}/bin/update-distribution.sh"],
+      ],
     }
   }
 
   if $update {
     ensure_resource('concat', "${basedir}/${repository}/conf/updates", {
-      owner   => $::reprepro::params::user_name,
-      group   => $::reprepro::params::group_name,
+      owner   => $reprepro::user_name,
+      group   => $reprepro::group_name,
       mode    => '0640',
       require => File["${basedir}/${repository}/conf"],
     })

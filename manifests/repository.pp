@@ -142,7 +142,7 @@ define reprepro::repository (
   cron { "incoming ${name} cron":
     ensure      => $ensure_incoming_cron,
     command     => "reprepro -b ${basedir}/${name} processincoming ${incoming_name}",
-    user        => $::reprepro::params::user_name,
+    user        => $reprepro::user_name,
     environment => 'SHELL=/bin/bash',
     minute      => '*/5',
   }
