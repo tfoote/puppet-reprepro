@@ -80,7 +80,7 @@ define reprepro::distribution (
   }
 
   exec {"export distribution ${name}":
-    command     => "su -c 'reprepro -b ${basedir}/${repository} export ${codename}' reprepro",
+    command     => "su -c 'reprepro -b ${basedir}/${repository} export ${codename}' ${reprepro::user_name}",
     path        => ['/bin', '/usr/bin'],
     onlyif      => '',
     refreshonly => true,
