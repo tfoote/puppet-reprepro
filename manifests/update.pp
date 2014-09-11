@@ -36,6 +36,7 @@ define reprepro::update (
   $architectures  = undef,
   $components     = undef,
   $udebcomponents = undef,
+  $flat           = undef,
   $verify_release = 'blindtrust',
   $filter_action  = '',
   $filter_name    = '',
@@ -43,6 +44,10 @@ define reprepro::update (
 
   include reprepro::params
   include concat::setup
+
+  if $flat and ($components or $udebcomponents) {
+    fail('$components and $udebcomponents are not allowed when $flat is provided.')
+  }
 
   if $filter_name != '' {
     if $filter_action == '' {
