@@ -4,8 +4,6 @@
 #
 class reprepro::params inherits reprepro::globals {
 
-  module_puppet::debug { "${module_name}-params": }
-
   $ensure  = present
   $basedir = pick($basedir, '/var/packages')
   $homedir = pick($homedir, '/var/packages')
