@@ -1,4 +1,4 @@
-# == Definition: reprepro::distribution
+# == Definition: distribution
 #
 # Adds a "Distribution" to manage.
 #
@@ -29,7 +29,7 @@
 #
 # === Example
 #
-#   reprepro::distribution {"lenny":
+#   distribution {"lenny":
 #     ensure        => present,
 #     repository    => "my-repository",
 #     origin        => "Camptocamp",
@@ -53,7 +53,7 @@ define reprepro::distribution (
   $sign_with      = '',
   $codename       = $name,
   $ensure         = present,
-  $basedir        = $::reprepro::params::basedir,
+  $basedir        = $::params::basedir,
   $udebcomponents = $components,
   $deb_indices    = 'Packages Release .gz .bz2',
   $dsc_indices    = 'Sources Release .gz .bz2',
@@ -80,13 +80,12 @@ define reprepro::distribution (
   }
 
   exec {"export distribution ${name}":
-    command     => "su -c 'reprepro -b ${basedir}/${repository} export ${codename}' ${reprepro::user_name}",
+    command     => "su -c 'reprepro -b ${basedir}/${repository} export ${codename}' ${::reprepro::params::user_name}",
     path        => ['/bin', '/usr/bin'],
-    onlyif      => '',
     refreshonly => true,
     logoutput   => on_failure,
     require     => [
-      User[$reprepro::user_name],
+      User[$::reprepro::params::user_name],
       Reprepro::Repository[$repository]
     ],
   }
@@ -95,34 +94,34 @@ define reprepro::distribution (
   file { "${basedir}/${repository}/tmp/${codename}":
     ensure => directory,
     mode   => '0755',
-    owner  => $reprepro::user_name,
-    group  => $reprepro::group_name,
+    owner  => $::reprepro::params::user_name,
+    group  => $::reprepro::params::group_name,
   }
 
   if $install_cron {
 
     if $snapshots {
-      $command = "${reprepro::homedir}/bin/update-distribution.sh -r ${repository} -c ${codename} -s"
+      $command = "${::reprepro::params::homedir}/bin/update-distribution.sh -r ${repository} -c ${codename} -s"
     } else {
-      $command = "${reprepro::homedir}/bin/update-distribution.sh -r ${repository} -c ${codename}"
+      $command = "${::reprepro::params::homedir}/bin/update-distribution.sh -r ${repository} -c ${codename}"
     }
 
     cron { "${name} cron":
       command     => $command,
-      user        => $reprepro::user_name,
+      user        => $::reprepro::params::user_name,
       environment => 'SHELL=/bin/bash',
       minute      => '*/5',
       require     => [
-        User[$reprepro::user_name],
-        File["${reprepro::homedir}/bin/update-distribution.sh"],
+        User[$::reprepro::params::user_name],
+        File["${::reprepro::params::homedir}/bin/update-distribution.sh"],
       ],
     }
   }
 
   if $update {
     ensure_resource('concat', "${basedir}/${repository}/conf/updates", {
-      owner   => $reprepro::user_name,
-      group   => $reprepro::group_name,
+      owner   => $::reprepro::params::user_name,
+      group   => $::reprepro::params::group_name,
       mode    => '0640',
       require => File["${basedir}/${repository}/conf"],
     })
