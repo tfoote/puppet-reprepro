@@ -34,8 +34,8 @@ define reprepro::repository (
   $incoming_dir    = 'incoming',
   $incoming_tmpdir = 'tmp',
   $incoming_allow  = '',
-  $owner           = 'reprepro',
-  $group           = 'reprepro',
+  $owner           = $::reprepro::params::user_name,
+  $group           = $::reprepro::params::group_name,
   $options         = ['verbose', 'ask-passphrase', 'basedir .']
   ) {
 
