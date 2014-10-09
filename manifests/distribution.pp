@@ -80,12 +80,12 @@ define reprepro::distribution (
   }
 
   exec {"export distribution ${name}":
-    command     => "su -c 'reprepro -b ${basedir}/${repository} export ${codename}' reprepro",
+    command     => "su -c 'reprepro -b ${basedir}/${repository} export ${codename}' ${::reprepro::params::user_name}",
     path        => ['/bin', '/usr/bin'],
     refreshonly => true,
     logoutput   => on_failure,
     require     => [
-      User['reprepro'],
+      User['reprepro'], #TODO not valid if manage_user false
       Reprepro::Repository[$repository]
     ],
   }
